@@ -31,7 +31,9 @@ executionStatusToBakeResults:
 # If a repository is set here, it will be added by packer as an apt repository when baking images for GCE and AWS.
 # It is safe to leave this out (or blank) if you do not need to configure your own apt repository.
 # The following commented-out line is an example of what a valid entry looks like.
-# debianRepository: http://dl.bintray.com/spinnaker/ospackages ./
+#debianRepository: http://dl.bintray.com/spinnaker/ospackages ./
+
+#if the repo ends in .repo it is assumed to be rpm and installed with yum
 
 defaultCloudProviderType: aws
 
@@ -41,16 +43,12 @@ aws:
     awsAssociatePublicIpAddress: true
     templateFile: aws-ebs.json
     defaultVirtualizationType: hvm
-    baseImages:
+    operatingSystemVirtualizationSettings:
     # TODO(duftler): Identify proper base amis.
     # TODO(duftler): Support additional store types beyond ebs.
     # TODO(duftler): Support additional operating systems.
     # TODO(duftler): Feels like just about everything here could be (optionally) specified per bake.
-    - baseImage:
-        id: ubuntu
-        shortDescription: v12.04
-        detailedDescription: Ubuntu Precise Pangolin v12.04
-        packageType: deb
+    - os: ubuntu
       virtualizationSettings:
       - region: us-east-1
         virtualizationType: hvm
@@ -73,11 +71,7 @@ aws:
 #        instanceType: m3.medium
 #        sourceAmi: 
 #        sshUserName: ubuntu
-    - baseImage:
-        id: trusty
-        shortDescription: v14.04
-        detailedDescription: Ubuntu Trusty Tahr v14.04
-        packageType: deb
+    - os: trusty
       virtualizationSettings:
       - region: us-east-1
         virtualizationType: hvm
@@ -99,25 +93,33 @@ aws:
         instanceType: m3.medium
         sourceAmi: ami-37501207
         sshUserName: ubuntu
-
+    - os: centos
+      virtualizationSettings:
+      - region: us-east-1
+        virtualizationType: hvm
+        instanceType: t2.micro
+        sourceAmi: ami-60b6c60a
+        sshUserName: ec2-user
+      - region: us-west-2
+        virtualizationType: hvm
+        instanceType: t2.micro
+        sourceAmi: ami-f0091d91
+        sshUserName: ec2-user
+      - region: us-west-1
+        virtualizationType: hvm
+        instanceType: t2.micro
+        sourceAmi: ami-d5ea86b5
+        sshUserName: ec2-user
 docker:
   enabled: ${DOCKER_ENABLED:false}
   bakeryDefaults:
     targetRepository: ${DOCKER_TARGET_REPOSITORY:}
     templateFile: docker.json
-    baseImages:
-    - baseImage:
-        id: precise
-        shortDescription: v12.04
-        detailedDescription: Ubuntu Precise Pangolin v12.04
-        packageType: deb
+    operatingSystemVirtualizationSettings:
+    - os: ubuntu
       virtualizationSettings:
         sourceImage: ubuntu:precise
-    - baseImage:
-        id: trusty
-        shortDescription: v14.04
-        detailedDescription: Ubuntu Trusty Tahr v14.04
-        packageType: deb
+    - os: trusty
       virtualizationSettings:
         sourceImage: ubuntu:trusty
 
@@ -128,19 +130,11 @@ google:
       zone: us-central1-f
       useInternalIp: false
       templateFile: gce.json
-      baseImages:
-      - baseImage:
-          id: precise
-          shortDescription: v12.04
-          detailedDescription: Ubuntu Precise Pangolin v12.04
-          packageType: deb
+      operatingSystemVirtualizationSettings:
+      - os: ubuntu
         virtualizationSettings:
           sourceImage: ubuntu-1204-precise-v20150910
-      - baseImage:
-          id: trusty
-          shortDescription: v14.04
-          detailedDescription: Ubuntu Trusty Tahr v14.04
-          packageType: deb
+      - os: trusty
         virtualizationSettings:
           sourceImage: ubuntu-1404-trusty-v20150909a
 
@@ -151,4 +145,3 @@ swagger:
   contact:
   patterns:
     - .*api/v1.*
-    - /bakeOptions.*

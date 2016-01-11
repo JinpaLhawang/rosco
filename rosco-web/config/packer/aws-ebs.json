@@ -28,7 +28,8 @@
     "source_ami": "{{user `aws_source_ami`}}",
     "ami_name": "{{user `aws_target_ami`}}",
     "associate_public_ip_address": "{{user `aws_associate_public_ip_address`}}",
-    "tags": {"appversion": "{{user `appversion`}}", "build_host": "{{user `build_host`}}"}
+    "tags": {"appversion": "{{user `appversion`}}", "build_host": "{{user `build_host`}}"},
+    "ssh_pty" : "true"
   }],
   "provisioners": [{
     "type": "shell",
